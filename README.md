@@ -2,4 +2,4 @@ NaiveInputMethod
 ================
 
 An Android input method
-+jkp
++jkp 2014.10.27
