@@ -42,6 +42,7 @@ import java.util.List;
  */
 public class SoftKeyboard extends InputMethodService 
         implements KeyboardView.OnKeyboardActionListener {
+	//继承InputMethodService  引入 KeyboardView.OnKeyboardActionListener接口，实现回调
     static final boolean DEBUG = false;
     
     /**
