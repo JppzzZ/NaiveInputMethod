@@ -42,7 +42,7 @@ import java.util.List;
  */
 public class SoftKeyboard extends InputMethodService 
         implements KeyboardView.OnKeyboardActionListener {
-	//�̳�InputMethodService  ���� KeyboardView.OnKeyboardActionListener�ӿڣ�ʵ�ֻص�
+	//继承InputMethodService  引入 KeyboardView.OnKeyboardActionListener接口，实现回调
     static final boolean DEBUG = false;
     
     /**
@@ -57,8 +57,8 @@ public class SoftKeyboard extends InputMethodService
 
     private InputMethodManager mInputMethodManager;
 
-    private LatinKeyboardView mInputView;
-    private CandidateView mCandidateView;
+    private LatinKeyboardView mInputView;  //键盘视图
+    private CandidateView mCandidateView;  //候选视图
     private CompletionInfo[] mCompletions;
     
     private StringBuilder mComposing = new StringBuilder();
@@ -69,11 +69,13 @@ public class SoftKeyboard extends InputMethodService
     private long mLastShiftTime;
     private long mMetaState;
     
+    //[键盘逻辑对象
     private LatinKeyboard mSymbolsKeyboard;
     private LatinKeyboard mSymbolsShiftedKeyboard;
     private LatinKeyboard mQwertyKeyboard;
+    //]]
     
-    private LatinKeyboard mCurKeyboard;
+    private LatinKeyboard mCurKeyboard;//  当前逻辑键盘
     
     private String mWordSeparators;
     
@@ -83,8 +85,8 @@ public class SoftKeyboard extends InputMethodService
      */
     @Override public void onCreate() {
         super.onCreate();
-        mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-        mWordSeparators = getResources().getString(R.string.word_separators);
+        mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);  //加载系统service
+        mWordSeparators = getResources().getString(R.string.word_separators);  //
     }
     
     /**
