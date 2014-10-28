@@ -86,14 +86,14 @@ public class SoftKeyboard extends InputMethodService
     @Override public void onCreate() {
         super.onCreate();
         mInputMethodManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);  //加载系统service
-        mWordSeparators = getResources().getString(R.string.word_separators);  //
+        mWordSeparators = getResources().getString(R.string.word_separators);  //分隔符
     }
     
     /**
      * This is the point where you can do all of your UI initialization.  It
      * is called after creation and any configuration change.
      */
-    @Override public void onInitializeInterface() {
+    @Override public void onInitializeInterface() {//初始化
         if (mQwertyKeyboard != null) {
             // Configuration changes can happen after the keyboard gets recreated,
             // so we need to be able to re-build the keyboards if the available
@@ -102,9 +102,11 @@ public class SoftKeyboard extends InputMethodService
             if (displayWidth == mLastDisplayWidth) return;
             mLastDisplayWidth = displayWidth;
         }
+        //[[键盘初始化声明
         mQwertyKeyboard = new LatinKeyboard(this, R.xml.qwerty);
         mSymbolsKeyboard = new LatinKeyboard(this, R.xml.symbols);
         mSymbolsShiftedKeyboard = new LatinKeyboard(this, R.xml.symbols_shift);
+        //]]
     }
     
     /**
@@ -113,11 +115,11 @@ public class SoftKeyboard extends InputMethodService
      * is displayed, and every time it needs to be re-created such as due to
      * a configuration change.
      */
-    @Override public View onCreateInputView() {
+    @Override public View onCreateInputView() {//创建键盘视图
         mInputView = (LatinKeyboardView) getLayoutInflater().inflate(
                 R.layout.input, null);
         mInputView.setOnKeyboardActionListener(this);
-        mInputView.setKeyboard(mQwertyKeyboard);
+        mInputView.setKeyboard(mQwertyKeyboard);//初始默认是qwerty键盘
         return mInputView;
     }
 
@@ -125,7 +127,7 @@ public class SoftKeyboard extends InputMethodService
      * Called by the framework when your view for showing candidates needs to
      * be generated, like {@link #onCreateInputView}.
      */
-    @Override public View onCreateCandidatesView() {
+    @Override public View onCreateCandidatesView() {//创建候选区视图
         mCandidateView = new CandidateView(this);
         mCandidateView.setService(this);
         return mCandidateView;
@@ -137,7 +139,7 @@ public class SoftKeyboard extends InputMethodService
      * bound to the client, and are now receiving all of the detailed information
      * about the target of our edits.
      */
-    @Override public void onStartInput(EditorInfo attribute, boolean restarting) {
+    @Override public void onStartInput(EditorInfo attribute, boolean restarting) {//弹出输入法函数
         super.onStartInput(attribute, restarting);
         
         // Reset our state.  We want to do this even if restarting, because
@@ -228,7 +230,7 @@ public class SoftKeyboard extends InputMethodService
      * This is called when the user is done editing a field.  We can use
      * this to reset our state.
      */
-    @Override public void onFinishInput() {
+    @Override public void onFinishInput() {//关闭输入法
         super.onFinishInput();
         
         // Clear current composing text and candidates.
@@ -247,7 +249,7 @@ public class SoftKeyboard extends InputMethodService
         }
     }
     
-    @Override public void onStartInputView(EditorInfo attribute, boolean restarting) {
+    @Override public void onStartInputView(EditorInfo attribute, boolean restarting) {//将选择的键盘载入视图。
         super.onStartInputView(attribute, restarting);
         // Apply the selected keyboard to the input view.
         mInputView.setKeyboard(mCurKeyboard);
@@ -266,7 +268,7 @@ public class SoftKeyboard extends InputMethodService
      */
     @Override public void onUpdateSelection(int oldSelStart, int oldSelEnd,
             int newSelStart, int newSelEnd,
-            int candidatesStart, int candidatesEnd) {
+            int candidatesStart, int candidatesEnd) {//更新选择区域时调用的回调函数
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
         
@@ -290,6 +292,11 @@ public class SoftKeyboard extends InputMethodService
      * in that situation.
      */
     @Override public void onDisplayCompletions(CompletionInfo[] completions) {
+    /*
+    This tells us about completions that the editor has determined based on the current text in it.
+    We want to use this in fullscreen mode to show the completions ourself, 
+    since the editor can not be seen in that situation.
+    */
         if (mCompletionOn) {
             mCompletions = completions;
             if (completions == null) {
@@ -311,7 +318,10 @@ public class SoftKeyboard extends InputMethodService
      * InputConnection.  It is only needed when using the
      * PROCESS_HARD_KEYS option.
      */
-    private boolean translateKeyDown(int keyCode, KeyEvent event) {
+    private boolean translateKeyDown(int keyCode, KeyEvent event) {//不懂干嘛的
+	    /*This translates incoming hard key events in to edit operations on an InputConnection.
+	     *It is only needed when using the PROCESS_HARD_KEYS option.
+	     */
         mMetaState = MetaKeyKeyListener.handleKeyDown(mMetaState,
                 keyCode, event);
         int c = event.getUnicodeChar(MetaKeyKeyListener.getMetaState(mMetaState));
@@ -348,7 +358,7 @@ public class SoftKeyboard extends InputMethodService
      * We get first crack at them, and can either resume them or let them
      * continue to the app.
      */
-    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {//那件按下触发的回调
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 // The InputMethodService already takes care of the back
@@ -415,7 +425,7 @@ public class SoftKeyboard extends InputMethodService
      * We get first crack at them, and can either resume them or let them
      * continue to the app.
      */
-    @Override public boolean onKeyUp(int keyCode, KeyEvent event) {
+    @Override public boolean onKeyUp(int keyCode, KeyEvent event) {//按键抬起触发的回调函数
         // If we want to do transformations on text being entered with a hard
         // keyboard, we need to process the up events to update the meta key
         // state we are tracking.
@@ -432,7 +442,7 @@ public class SoftKeyboard extends InputMethodService
     /**
      * Helper function to commit any text being composed in to the editor.
      */
-    private void commitTyped(InputConnection inputConnection) {
+    private void commitTyped(InputConnection inputConnection) {//键入editor
         if (mComposing.length() > 0) {
             inputConnection.commitText(mComposing, mComposing.length());
             mComposing.setLength(0);
@@ -444,7 +454,7 @@ public class SoftKeyboard extends InputMethodService
      * Helper to update the shift state of our keyboard based on the initial
      * editor state.
      */
-    private void updateShiftKeyState(EditorInfo attr) {
+    private void updateShiftKeyState(EditorInfo attr) {//更新shift按键状态
         if (attr != null 
                 && mInputView != null && mQwertyKeyboard == mInputView.getKeyboard()) {
             int caps = 0;
@@ -459,7 +469,7 @@ public class SoftKeyboard extends InputMethodService
     /**
      * Helper to determine if a given character code is alphabetic.
      */
-    private boolean isAlphabet(int code) {
+    private boolean isAlphabet(int code) {//判断是否是字母
         if (Character.isLetter(code)) {
             return true;
         } else {
@@ -470,7 +480,7 @@ public class SoftKeyboard extends InputMethodService
     /**
      * Helper to send a key down / key up pair to the current editor.
      */
-    private void keyDownUp(int keyEventCode) {
+    private void keyDownUp(int keyEventCode) {//按下抬起事件
         getCurrentInputConnection().sendKeyEvent(
                 new KeyEvent(KeyEvent.ACTION_DOWN, keyEventCode));
         getCurrentInputConnection().sendKeyEvent(
@@ -480,7 +490,7 @@ public class SoftKeyboard extends InputMethodService
     /**
      * Helper to send a character to the editor as raw key events.
      */
-    private void sendKey(int keyCode) {
+    private void sendKey(int keyCode) {//单个按键判定
         switch (keyCode) {
             case '\n':
                 keyDownUp(KeyEvent.KEYCODE_ENTER);
@@ -497,8 +507,9 @@ public class SoftKeyboard extends InputMethodService
 
     // Implementation of KeyboardViewListener
 
-    public void onKey(int primaryCode, int[] keyCodes) {
-        if (isWordSeparator(primaryCode)) {
+    public void onKey(int primaryCode, int[] keyCodes) {//KeyboardView.OnKeyboardActionListener的接口在此实现
+	    //用来做键盘按键输入的主要响应函数
+	    if (isWordSeparator(primaryCode)) {
             // Handle separator
             if (mComposing.length() > 0) {
                 commitTyped(getCurrentInputConnection());
@@ -531,7 +542,7 @@ public class SoftKeyboard extends InputMethodService
         }
     }
 
-    public void onText(CharSequence text) {
+    public void onText(CharSequence text) {//当有文本的时候触发的回调
         InputConnection ic = getCurrentInputConnection();
         if (ic == null) return;
         ic.beginBatchEdit();
@@ -548,7 +559,7 @@ public class SoftKeyboard extends InputMethodService
      * text.  This will need to be filled in by however you are determining
      * candidates.
      */
-    private void updateCandidates() {
+    private void updateCandidates() {//更新候选区
         if (!mCompletionOn) {
             if (mComposing.length() > 0) {
                 ArrayList<String> list = new ArrayList<String>();
@@ -561,7 +572,7 @@ public class SoftKeyboard extends InputMethodService
     }
     
     public void setSuggestions(List<String> suggestions, boolean completions,
-            boolean typedWordValid) {
+            boolean typedWordValid) {//根据输入联想
         if (suggestions != null && suggestions.size() > 0) {
             setCandidatesViewShown(true);
         } else if (isExtractViewShown()) {
@@ -572,7 +583,7 @@ public class SoftKeyboard extends InputMethodService
         }
     }
     
-    private void handleBackspace() {
+    private void handleBackspace() {//处理back建和space建
         final int length = mComposing.length();
         if (length > 1) {
             mComposing.delete(length - 1, length);
@@ -588,7 +599,7 @@ public class SoftKeyboard extends InputMethodService
         updateShiftKeyState(getCurrentInputEditorInfo());
     }
 
-    private void handleShift() {
+    private void handleShift() {//处理shift按键
         if (mInputView == null) {
             return;
         }
@@ -609,7 +620,7 @@ public class SoftKeyboard extends InputMethodService
         }
     }
     
-    private void handleCharacter(int primaryCode, int[] keyCodes) {
+    private void handleCharacter(int primaryCode, int[] keyCodes) {//除了字符
         if (isInputViewShown()) {
             if (mInputView.isShifted()) {
                 primaryCode = Character.toUpperCase(primaryCode);
@@ -626,13 +637,13 @@ public class SoftKeyboard extends InputMethodService
         }
     }
 
-    private void handleClose() {
+    private void handleClose() {//除里关闭
         commitTyped(getCurrentInputConnection());
         requestHideSelf(0);
         mInputView.closing();
     }
 
-    private void checkToggleCapsLock() {
+    private void checkToggleCapsLock() {//检查是否大写锁定
         long now = System.currentTimeMillis();
         if (mLastShiftTime + 800 > now) {
             mCapsLock = !mCapsLock;
