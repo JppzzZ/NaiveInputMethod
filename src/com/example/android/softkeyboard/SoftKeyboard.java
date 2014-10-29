@@ -509,24 +509,26 @@ public class SoftKeyboard extends InputMethodService
 
     public void onKey(int primaryCode, int[] keyCodes) {//KeyboardView.OnKeyboardActionListener的接口在此实现
 	    //用来做键盘按键输入的主要响应函数
-	    if (isWordSeparator(primaryCode)) {
+	 if (isWordSeparator(primaryCode)) {
             // Handle separator
+	     // 粗线了分隔符意味着要内容输入editor了
             if (mComposing.length() > 0) {
+       	  // 正在编辑的字符串长度大于0时，直接键入editor
                 commitTyped(getCurrentInputConnection());
             }
-            sendKey(primaryCode);
-            updateShiftKeyState(getCurrentInputEditorInfo());
-        } else if (primaryCode == Keyboard.KEYCODE_DELETE) {
+            sendKey(primaryCode);// 键入输入的分隔符
+            updateShiftKeyState(getCurrentInputEditorInfo());//更新
+        } else if (primaryCode == Keyboard.KEYCODE_DELETE) {//删除键
             handleBackspace();
-        } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {
+        } else if (primaryCode == Keyboard.KEYCODE_SHIFT) {//shift键
             handleShift();
-        } else if (primaryCode == Keyboard.KEYCODE_CANCEL) {
+        } else if (primaryCode == Keyboard.KEYCODE_CANCEL) {//取消按键（感觉是按了back键）
             handleClose();
             return;
-        } else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {
+        } else if (primaryCode == LatinKeyboardView.KEYCODE_OPTIONS) {//菜单键
             // Show a menu or somethin'
         } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE
-                && mInputView != null) {
+                && mInputView != null) {//mode change！！！mQwertyKeyboard与mSymbolsKeyboard相互变换
             Keyboard current = mInputView.getKeyboard();
             if (current == mSymbolsKeyboard || current == mSymbolsShiftedKeyboard) {
                 current = mQwertyKeyboard;
@@ -537,7 +539,7 @@ public class SoftKeyboard extends InputMethodService
             if (current == mSymbolsKeyboard) {
                 current.setShifted(false);
             }
-        } else {
+        } else {//单纯按下普通按键
             handleCharacter(primaryCode, keyCodes);
         }
     }
